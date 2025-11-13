@@ -1,3 +1,5 @@
+-- Trigger --
+-- Log every deletion in the Orders table.--
 CREATE DATABASE sales;
 CREATE TABLE Orders (
     Order_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -41,6 +43,7 @@ DELIMITER ;
 
 -- testing --
 DELETE FROM Orders WHERE customer_name = 'Divya Priya';
+-- -------------------------------------------------------------------------------------------------------------------------------------------
 
 -- DCL COMMANDS --
 -- Grant reporting access to junior analysts--
@@ -48,3 +51,44 @@ CREATE USER 'Juni_analyst'@'localhost' IDENTIFIED BY '123456789';
 GRANT SELECT, INSERT, DELETE ON COLLEGE.* TO Juni_analyst@localhost;
 SHOW GRANTS FOR 'Juni_analyst'@'localhost';
 REVOKE INSERT ON COLLEGE.* FROM Juni_analyst@localhost;
+-- -------------------------------------------------------------------------------------------------------------------------------------
+-- TCL COMMANDS --
+-- Bank Transfer : COMMIT, SAVEPOINT, ROLLBACK --
+SELECT @@autocommit;
+SET @@autocommit = 0;
+
+CREATE DATABASE IF NOT EXISTS BANK;
+CREATE TABLE bank_account (
+    account_no INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    balance DECIMAL(10,2)
+);
+INSERT INTO bank_account VALUES
+(101, 'Priya Kamalesh', 10000.00),
+(102, 'Raj Kumar', 8000.00),
+(104, 'Vijaya lakshmi', 10000.00),
+(105, 'Preethi rajan', 8000.00);
+
+SELECT * FROM bank_account;
+
+
+START TRANSACTION;
+UPDATE bank_account
+SET balance = 15000
+WHERE account_no = 101;
+SAVEPOINT After_addition;
+
+UPDATE bank_account
+SET balance = balance - 2000
+WHERE account_no = 104;
+SAVEPOINT After_deduction;
+
+SELECT * FROM bank_account;
+
+ROLLBACK TO SAVEPOINT After_addition;
+SELECT * FROM bank_account;
+
+COMMIT;
+ROLLBACK;
+
+
